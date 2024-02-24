@@ -1,0 +1,1 @@
+# azure-function-v2-template-python
