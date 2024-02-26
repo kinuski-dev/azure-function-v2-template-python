@@ -41,15 +41,15 @@ Although the routing may look like `/func_1/method_1` and `/func_2/method_1`, th
 
 # Local development and debugging
 ## Environment
-- Create new virtual environment: `\python\python310\python -m venv .venv`
+- Create new virtual environment: `\python\python310\python -m venv .venv`, assuming that Python 3.10 is installed to Windows' C:\python\python310
 - Upgrade pip: `.venv\Scripts\python.exe -m pip install --upgrade pip`
 - Install packages in requirememts.txt: `.venv\Scripts\python -m pip install -r requirements.txt`
 - Activate virtual environment (venv): `.venv\Scripts\activate`
 
 ## Run locally
 - Start function locally for debugging: `func start --python`
-- The function listens at `http://localhost:7071/api/...`
-- Stop local debugging: `hit Ctrl+C`
+- The function listens at `http://localhost:7071/api/<routing>`
+- Stop local debugging: hit `Ctrl+C`
 
 ## Errors and Warnings
 **Error:**
