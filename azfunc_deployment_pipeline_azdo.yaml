@@ -1,0 +1,106 @@
+# YAML CI/CD pipeline for the Azure Function App deployment with AzDO (Azure DevOps)
+#
+# Contains 2 stages:
+# 1. deployDev - deploys the Azure Function App to the Development subscription. Also publishes the artifact
+#    and is a prerequisite to the deplyProd stage.
+# 2. deployProd - deploys the Azure Function App to the Production subscription. Runs conditionally
+#    if the deployDev stage succeeded AND deployment to Production was selected (true by default).
+#
+# NB! Python libraries must be installed to the specific path or else they will be missing in the deployed App
+#
+# YAML -> https://aka.ms/yaml
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+  - name: deployToDev
+    displayName: Deploy to DEV
+    type: boolean
+    default: true
+  - name: deployToProd
+    displayName: Deploy to PROD
+    type: boolean
+    default: true
+
+variables:
+  - name: artifactName
+    value: 'AzFunc'
+
+stages:
+  - stage: deployDev
+    displayName: 'Deploy Azure Function to DEV'
+    condition: eq(${{ parameters.deployToDev }}, true)
+    jobs:
+      - job: deployAzureFunction
+        displayName: 'Deploy Azure Function'
+
+        steps:
+          - task: UsePythonVersion@0
+            displayName: 'Set Python version to 3.11'
+            inputs:
+              versionSpec: '3.11'
+              architecture: 'x64'
+
+          - task: CmdLine@2
+            displayName: 'Install Python libraries'
+            inputs:
+              script: 'pip install -r requirements.txt --target="./.python_packages/lib/site-packages"'
+              workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+          - task: CmdLine@2
+            displayName: 'List Python libraries'
+            inputs:
+              script: 'pip list --path "./.python_packages/lib/site-packages"'
+              workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+          - task: ArchiveFiles@2
+            displayName: 'Archive files'
+            inputs:
+              rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+              includeRootFolder: false
+              archiveFile: '$(System.DefaultWorkingDirectory)/build_$(Build.BuildId).zip'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish artifact'
+            inputs:
+              PathtoPublish: '$(System.DefaultWorkingDirectory)/build_$(Build.BuildId).zip'
+              artifactName: ${{ variables.artifactName }}
+
+          - task: AzureFunctionApp@2
+            displayName: 'Deploy Function to DEV'
+            inputs:
+              azureSubscription: 'Dev-Subscription (00000000-0000-0000-0000-000000000000)'
+              appType: functionAppLinux
+              appName: 'azfunc-my-v2-function-dev'
+              runtimeStack: 'PYTHON|3.11'
+              deploymentMethod: 'zipDeploy'
+              package: '$(System.DefaultWorkingDirectory)/build_$(Build.BuildId).zip'
+
+  - stage: deployProd
+    displayName: 'Deploy Azure Function to PROD'
+    dependsOn: deployDev
+    condition: and( succeeded('deployDev'), eq(${{ parameters.deployToProd }}, true) )
+    jobs:
+      - job: deployAzureFunction
+        displayName: 'Deploy Azure Function'
+
+        steps:
+          - task: DownloadBuildArtifacts@1
+            displayName: 'Download artifact'
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              downloadPath: '$(System.ArtifactsDirectory)'
+
+          - task: AzureFunctionApp@2
+            displayName: 'Deploy Function to PROD'
+            inputs:
+              azureSubscription: 'Prod-Subscription (11111111-1111-1111-1111-111111111111)'
+              appType: functionAppLinux
+              appName: 'azfunc-my-v2-function-prod'
+              runtimeStack: 'PYTHON|3.11'
+              deploymentMethod: 'zipDeploy'
+              package: '$(System.ArtifactsDirectory)/${{ variables.artifactName }}/build_$(Build.BuildId).zip'
