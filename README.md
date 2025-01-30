@@ -128,6 +128,35 @@ Make sure the Azure Storage Emulator is running.
 
 **Solution:** Can be safely ignored
 
+# Azure
+
+## CI/CD
+
+### Deployment, stages
+
+AzDO YAML pipeline automatically deploys the code to the Function App when there is a new commit to the `main` branch.
+
+- Stage 1 of the pipeline deploys to the Development subscription. Executes automatically.
+- Stage 2 of the pipeline deploys to the Production subscription. Requires manual execution. Successful execution of the Stage 1 is a prerequisite for Stage 2 - you must select both stages when executing the YAML pipeline manually in AzDO.
+
+### Python dependencies
+
+Python dependencies must be installed into the pipeline working directory (`--target` in the example below), otherwise the code will never appear in the Function App and it will be difficult to troubleshoot it - there will be no clear error messages to understand the source of the problem.
+
+```yaml
+- task: CmdLine@2
+    displayName: 'Install Python libraries'
+    inputs:
+        script: 'pip install -r requirements.txt --target="./.python_packages/lib/site-packages"'
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
+```
+
+## Troubleshooting and debugging
+
+### App settings
+
+You can access Function App settings in Development Subscription via [https://azfunc-my-v2-function-dev.scm.azurewebsites.net/api/settings](https://azfunc-my-v2-function-dev.scm.azurewebsites.net/api/settings)
+
 # Useful resources
 
 - [Azure Functions V2 Python developer guide](https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python)

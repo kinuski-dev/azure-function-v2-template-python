@@ -1,3 +1,6 @@
+"""
+Azure Functions bindings for the entire App Service
+"""
 import azure.functions as func
 from functions.func_1.method_1 import blueprint_func_1_method_1
 from functions.func_1.method_2 import blueprint_func_1_method_2

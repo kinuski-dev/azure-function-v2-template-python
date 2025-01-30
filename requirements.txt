@@ -2,4 +2,6 @@
 # The Python Worker is managed by Azure Functions platform
 # Manually managing azure-functions-worker may cause unexpected issues
 
-azure-functions
+# Do not include standard modules such as json, re, etc.
+
+azure-functions>=1.18.0
