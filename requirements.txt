@@ -4,4 +4,4 @@
 
 # Do not include standard modules such as json, re, etc.
 
-azure-functions>=1.18.0
+azure-functions>=2.3.0

@@ -1,0 +1,4 @@
+# Local development and test dependencies; not deployed to Azure
+-r requirements.txt
+
+pytest>=8.0.0
