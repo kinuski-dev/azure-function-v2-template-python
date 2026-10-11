@@ -1,8 +1,8 @@
 # Introduction
 
-The repository is a simple template for an Azure Function App-based API implementation with two functions and two methods for each function.
+This repository is a simple template for an Azure Function App-based API with two functions and two methods per function.
 
-The purpose is to have an easy-to-use starter pack with defined blueprints and API routing. Copy-paste the template to a new Azure Function app or use it as a model.
+It provides an easy-to-use starter pack with defined blueprints and API routing. Copy and paste the template into a new Azure Function app or use it as a model when creating a new repository.
 
 # Project and Repository Structure
 
@@ -16,12 +16,14 @@ The purpose is to have an easy-to-use starter pack with defined blueprints and A
             ├── _commons.py  - shared classes, functions, definitions
             ├── method_1.py  - method 1 implementation
             ├── method_2.py  - method 2 implementation
-    ├── tests                - tests (not included in the template)
+    ├── tests                - sample tests
     ├── function_app.py      - functions & methods registry
-    ├── host.json            - Function app coniguration options
+    ├── host.json            - Function app configuration options
     ├── local.settings.json  - app settings and connection strings for local execution
-    ├── README.md            - this readme file
+    ├── README.md            - this README file
     ├── requirements.txt     - Azure Functions prerequisites
+    ├── AGENTS.md            - guidance for Agents
+    ├── CLAUDE.md            - guidance for Claude; refers to AGENTS.md
 ```
 
 # Azure Function Routing
@@ -30,16 +32,16 @@ The purpose is to have an easy-to-use starter pack with defined blueprints and A
     ├── /api/func_1          - function 1
         ├── /method_1        - method 1
         ├── /method_2        - method 2
-    ├── /api/func2          - function 2
+    ├── /api/func_2          - function 2
         ├── /method_1        - method 1
         ├── /method_2        - method 2
 ```
 
 For example,  
-func_1_method_1: [GET, POST] http://localhost:7071/api/func_1/method_1  
-func_1_method_2: [GET, POST] http://localhost:7071/api/func_1/method_2  
-func_2_method_1: [GET, POST] http://localhost:7071/api/func_2/method_1  
-func_2_method_2: [GET, POST] http://localhost:7071/api/func_2/method_2  
+func_1_method_1: [GET, POST] - http://localhost:7071/api/func_1/method_1  
+func_1_method_2: [GET]       - http://localhost:7071/api/func_1/method_2  
+func_2_method_1: [GET, POST] - http://localhost:7071/api/func_2/method_1  
+func_2_method_2: [GET]       - http://localhost:7071/api/func_2/method_2  
 
 ## Unique method function names
 
@@ -49,21 +51,26 @@ Although the routing may look like `/func_1/method_1` and `/func_2/method_1`, th
 
 # Local development and debugging
 
+## AGENTS.md content
+
+The AGENTS.md content describes this template. After you create an Azure Function using this template, you'll need to edit the file to match your application requirements.
+
 ## Virtual environment (venv)
 
-- Create new virtual environment: `\python\python311\python -m venv .venv`
+- Create a new virtual environment: `\python\python313\python -m venv .venv`
 - Upgrade pip: `.venv\Scripts\python.exe -m pip install --upgrade pip`
-- Install packages in requirememts.txt: `.venv\Scripts\python -m pip install -r requirements.txt`
+- Install packages in requirements.txt: `.venv\Scripts\python -m pip install -r requirements.txt`
 - Activate virtual environment (venv): `.venv\Scripts\activate`
+- Deactivate virtual environment (venv): `deactivate`
 
 ## Azure Storage Emulator
 
-CRON and diagnostics events stored locally require running Storage Emulator. On Windows, the Storage Emulator is usually found at `C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator`. The Config file `AzureStorageEmulator.exe.config` defines Storage Service listeners as follows.
+CRON and diagnostics events stored locally require running the Storage Emulator. On Windows, the Storage Emulator is usually found at `C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator`. The Config file `AzureStorageEmulator.exe.config` defines Storage Service listeners as follows.
 
 ```xml
   <StorageEmulatorConfig>
     <services>
-      <service name="Blob" url="http://127.0.0.1:10000/"/>
+      <service name="Blob"  url="http://127.0.0.1:10000/"/>
       <service name="Queue" url="http://127.0.0.1:10001/"/>
       <service name="Table" url="http://127.0.0.1:10002/"/>
     </services>
@@ -132,16 +139,20 @@ Make sure the Azure Storage Emulator is running.
 
 ## CI/CD
 
-### Deployment, stages
+### WARNING
+
+Make sure your deployment method does not ship files and folders listed in thr `.funcignore` file.
+
+### Deployment and stages
 
 AzDO YAML pipeline automatically deploys the code to the Function App when there is a new commit to the `main` branch.
 
 - Stage 1 of the pipeline deploys to the Development subscription. Executes automatically.
-- Stage 2 of the pipeline deploys to the Production subscription. Requires manual execution. Successful execution of the Stage 1 is a prerequisite for Stage 2 - you must select both stages when executing the YAML pipeline manually in AzDO.
+- Stage 2 of the pipeline deploys to the Production subscription. Will execute if Stage 1 succeeds. Successful execution of Stage 1 is a prerequisite for Stage 2 - you must select both stages when executing the YAML pipeline manually in AzDO.
 
 ### Python dependencies
 
-Python dependencies must be installed into the pipeline working directory (`--target` in the example below), otherwise the code will never appear in the Function App and it will be difficult to troubleshoot it - there will be no clear error messages to understand the source of the problem.
+Install Python dependencies into the pipeline working directory (`--target` in the example below); otherwise, the code will never appear in the Function App, and troubleshooting will be difficult because there will be no clear error messages to identify the source of the problem.
 
 ```yaml
 - task: CmdLine@2
