@@ -1,10 +1,12 @@
-# Introduction
+# Azure Function Template v.2 with Blueprints for Python
+
+## Introduction
 
 This repository is a simple template for an Azure Function App-based API with two functions and two methods per function.
 
 It provides an easy-to-use starter pack with defined blueprints and API routing. Copy and paste the template into a new Azure Function app or use it as a model when creating a new repository.
 
-# Project and Repository Structure
+## Project and Repository Structure
 
 ```text
     ├── functions            - root folder for the functions and their methods
@@ -26,7 +28,7 @@ It provides an easy-to-use starter pack with defined blueprints and API routing.
     ├── CLAUDE.md            - guidance for Claude; refers to AGENTS.md
 ```
 
-# Azure Function Routing
+## Azure Function Routing
 
 ```text
     ├── /api/func_1          - function 1
@@ -43,27 +45,27 @@ func_1_method_2: [GET]       - http://localhost:7071/api/func_1/method_2
 func_2_method_1: [GET, POST] - http://localhost:7071/api/func_2/method_1  
 func_2_method_2: [GET]       - http://localhost:7071/api/func_2/method_2  
 
-## Unique method function names
+### Unique method function names
 
 NB! The names for functions implemented in the `method_N.py` files and published in the `function_app.py` must be unique across the entire Function service app.
 
 Although the routing may look like `/func_1/method_1` and `/func_2/method_1`, the function definition must be like `def func_1_method_1():` and `def func_2_method_1():`. Defining both functions as `def method_1():` will cause a binding error.
 
-# Local development and debugging
+## Local development and debugging
 
-## AGENTS.md content
+### AGENTS.md content
 
 The AGENTS.md content describes this template. After you create an Azure Function using this template, you'll need to edit the file to match your application requirements.
 
-## Virtual environment (venv)
+### Virtual environment (venv)
 
-- Create a new virtual environment: `\python\python313\python -m venv .venv`
+- Create a new virtual environment: `py -3.14 -m venv .venv`
 - Upgrade pip: `.venv\Scripts\python.exe -m pip install --upgrade pip`
 - Install packages in requirements.txt: `.venv\Scripts\python -m pip install -r requirements.txt`
 - Activate virtual environment (venv): `.venv\Scripts\activate`
 - Deactivate virtual environment (venv): `deactivate`
 
-## Azure Storage Emulator
+### Azure Storage Emulator
 
 CRON and diagnostics events stored locally require running the Storage Emulator. On Windows, the Storage Emulator is usually found at `C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator`. The Config file `AzureStorageEmulator.exe.config` defines Storage Service listeners as follows.
 
@@ -89,13 +91,13 @@ AzureStorageEmulator.exe clear          : Delete all data in the emulator
 AzureStorageEmulator.exe help [command] : Show general or command-specific help
 ```
 
-## Run locally
+### Run locally
 
 - Start function locally for debugging: `func start --python [--verbose]`
 - The function listens at `http://localhost:7071/api/<routing>`
 - Stop local debugging: hit `Ctrl+C`
 
-## Errors and Warnings
+### Errors and Warnings
 
 **Error:**
 
@@ -135,22 +137,22 @@ Make sure the Azure Storage Emulator is running.
 
 **Solution:** Can be safely ignored
 
-# Azure
+## Azure
 
-## CI/CD
+### CI/CD
 
-### WARNING
+#### WARNING
 
-Make sure your deployment method does not ship files and folders listed in thr `.funcignore` file.
+Make sure your deployment method does not ship files and folders listed in the `.funcignore` file.
 
-### Deployment and stages
+#### Deployment and stages
 
 AzDO YAML pipeline automatically deploys the code to the Function App when there is a new commit to the `main` branch.
 
 - Stage 1 of the pipeline deploys to the Development subscription. Executes automatically.
 - Stage 2 of the pipeline deploys to the Production subscription. Will execute if Stage 1 succeeds. Successful execution of Stage 1 is a prerequisite for Stage 2 - you must select both stages when executing the YAML pipeline manually in AzDO.
 
-### Python dependencies
+#### Python dependencies
 
 Install Python dependencies into the pipeline working directory (`--target` in the example below); otherwise, the code will never appear in the Function App, and troubleshooting will be difficult because there will be no clear error messages to identify the source of the problem.
 
@@ -162,13 +164,13 @@ Install Python dependencies into the pipeline working directory (`--target` in t
         workingDirectory: '$(System.DefaultWorkingDirectory)'
 ```
 
-## Troubleshooting and debugging
+### Troubleshooting and debugging
 
-### App settings
+#### App settings
 
 You can access Function App settings in Development Subscription via [https://azfunc-my-v2-function-dev.scm.azurewebsites.net/api/settings](https://azfunc-my-v2-function-dev.scm.azurewebsites.net/api/settings)
 
-# Useful resources
+## Useful resources
 
 - [Azure Functions V2 Python developer guide](https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python)
 - [Develop Azure Functions locally using Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local)

@@ -8,7 +8,7 @@ This file guides AI agents working in this repository. This file doesn't fully r
 
 A starter template for an HTTP API built on the **Azure Functions Python v2 programming model** (decorators and blueprints, no `function.json`). It has two "functions" (`func_1`, `func_2`), each with two "methods" (`method_1`, `method_2`). Each method is its own Azure Function, exposed at `/api/<func>/<method>`. People copy the template into a new Function App and replace the placeholder handlers. It is possible to create a new Azure Functions repository using the template - all code will be copied automatically.
 
-Targets Python 3.13, `azure-functions>=2.3.0`, the Linux Function App and extension bundle `[4.*, 5.0.0)`.
+Targets Python 3.14, `azure-functions>=2.3.0`, the Linux Function App and extension bundle `[4.*, 5.0.0)`.
 
 ## Layout
 
@@ -60,7 +60,7 @@ def func_1_method_1(req: func.HttpRequest) -> func.HttpResponse:
 ## Local development (Windows)
 
 ```powershell
-\python\python313\python -m venv .venv
+py -3.14 -m venv .venv
 .venv\Scripts\python.exe -m pip install --upgrade pip
 .venv\Scripts\python -m pip install -r requirements.txt
 .venv\Scripts\activate
@@ -80,7 +80,7 @@ func start --python          # http://localhost:7071/api/<func>/<method>
 
 `azfunc_deployment_pipeline_azdo.yaml` runs on every commit to `main`:
 
-- **deployDev** sets up Python 3.13 and installs `requirements.txt` into `./.python_packages/lib/site-packages`. That exact path is required, otherwise the deployed app silently has no packages. The stage then zips the working directory, publishes it as artifact `AzFunc` and zip-deploys it to `azfunc-my-v2-function-dev`.
+- **deployDev** sets up Python 3.14 and installs `requirements.txt` into `./.python_packages/lib/site-packages`. That exact path is required, otherwise the deployed app silently has no packages. The stage then zips the working directory, publishes it as artifact `AzFunc` and zip-deploys it to `azfunc-my-v2-function-dev`.
 - **deployProd** depends on `deployDev` succeeding. It downloads the same artifact and deploys it to `azfunc-my-v2-function-prod`. `deployToProd` defaults to `true` and there's no approval gate, so a successful DEV deploy goes straight on to PROD.
 
 Subscription names and app names in the pipeline are placeholders.
